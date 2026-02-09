@@ -1,0 +1,9 @@
+node_modules
+.env.local
+*.log
+.DS_Store
+auto_build_db.js
+seed_db.js
+setup_supabase.js
+setup_storage.js
+diagnose_db.js

@@ -1,20 +1,65 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Mundo Mágico - Salón de Fiestas Infantiles
 
-# Run and deploy your AI Studio app
+Sistema de turnero online premium con panel de administración integrado.
 
-This contains everything you need to run your app locally.
+## 🚀 Deploy en Vercel
 
-View your app in AI Studio: https://ai.studio/apps/drive/10RprxqVFu83YBKB5n23246t1vUM8DlL3
+### Variables de Entorno Requeridas
 
-## Run Locally
+Antes de hacer el deploy, configurá estas variables en Vercel:
 
-**Prerequisites:**  Node.js
+1. `VITE_SUPABASE_URL` - URL de tu proyecto Supabase
+2. `VITE_SUPABASE_ANON_KEY` - Clave pública (anon key) de Supabase
 
+### Pasos para Deploy
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. **Conectar con GitHub:**
+   ```bash
+   vercel --prod
+   ```
+
+2. **O desde la interfaz de Vercel:**
+   - Importá el repositorio desde GitHub
+   - Vercel detectará automáticamente que es un proyecto Vite
+   - Agregá las variables de entorno en Settings → Environment Variables
+
+3. **Build automático:**
+   - Vercel ejecutará `npm run build` automáticamente
+   - El directorio de salida es `dist/`
+
+## 📦 Estructura del Proyecto
+
+```
+├── components/          # Componentes React
+├── lib/                # Configuración de Supabase
+├── dist/               # Build de producción (generado)
+├── index.html          # HTML principal
+├── index.tsx           # Entry point de React
+├── App.tsx             # Componente raíz
+├── utils.ts            # Utilidades y helpers
+├── types.ts            # Tipos TypeScript
+└── vercel.json         # Configuración de Vercel
+```
+
+## 🛠️ Desarrollo Local
+
+```bash
+npm install
+npm run dev
+```
+
+## 🔒 Seguridad
+
+- Row Level Security (RLS) habilitado en Supabase
+- Headers de seguridad configurados en Vercel
+- Variables de entorno protegidas
+
+## 📱 Características
+
+- ✅ Responsive design (Mobile-first)
+- ✅ Panel de administración completo
+- ✅ Sistema de reservas en tiempo real
+- ✅ Gestión de contenido dinámico
+- ✅ Galería de imágenes con upload
+- ✅ Integración con WhatsApp
+- ✅ SEO optimizado
