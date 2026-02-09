@@ -22,18 +22,18 @@ const Hero: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center pt-28 pb-20 overflow-hidden bg-[#fafafa]">
+    <section className="relative min-h-screen flex items-center pt-28 pb-20 overflow-hidden bg-gradient-to-br from-pink-50/30 via-purple-50/20 to-blue-50/30">
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[10%] -right-[10%] w-[80%] h-[80%] bg-gradient-to-br from-pink-100/40 to-purple-100/40 rounded-full blur-[100px] opacity-70"
+          className="absolute -top-[10%] -right-[10%] w-[80%] h-[80%] bg-gradient-to-br from-pink-100/40 to-purple-100/40 rounded-full blur-[100px] opacity-70 will-change-transform"
         />
         <motion.div
           animate={{ rotate: -360 }}
           transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-[10%] -left-[10%] w-[70%] h-[70%] bg-gradient-to-tr from-blue-100/30 to-pink-100/30 rounded-full blur-[90px] opacity-60"
+          className="absolute -bottom-[10%] -left-[10%] w-[70%] h-[70%] bg-gradient-to-tr from-blue-100/30 to-pink-100/30 rounded-full blur-[90px] opacity-60 will-change-transform"
         />
         <Particles />
       </div>
@@ -113,6 +113,9 @@ const Hero: React.FC = () => {
               src={content.image}
               className="rounded-2xl lg:rounded-[2rem] w-full h-[250px] lg:h-[500px] object-cover object-center shadow-2xl mb-6 lg:mb-8"
               alt="Salón Mundo Mágico"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
             />
             <div className="flex items-center justify-between">
               <div>

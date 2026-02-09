@@ -23,8 +23,14 @@ const ContactSection: React.FC = () => {
     }, []);
 
     return (
-        <section id="contacto" className="py-24 bg-white overflow-hidden">
-            <div className="max-w-7xl mx-auto px-6">
+        <section id="contacto" className="py-24 bg-gradient-to-br from-white via-pink-50/20 to-purple-50/30 overflow-hidden relative">
+            {/* Background decorations */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-1/3 left-0 w-[500px] h-[500px] bg-pink-200/20 rounded-full blur-[140px] opacity-50" />
+                <div className="absolute bottom-1/3 right-0 w-[500px] h-[500px] bg-purple-200/20 rounded-full blur-[140px] opacity-50" />
+            </div>
+
+            <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <div className="bg-gradient-to-br from-pink-500 to-purple-600 rounded-[3rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row items-stretch">
 
                     {/* Text Content */}
@@ -108,6 +114,8 @@ const ContactSection: React.FC = () => {
                             src={content.image}
                             className="absolute inset-0 w-full h-full object-cover object-center"
                             alt="Contacto Mundo Mágico"
+                            loading="lazy"
+                            decoding="async"
                         />
                         {/* Overlay for depth */}
                         <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-pink-600/20 hidden lg:block" />

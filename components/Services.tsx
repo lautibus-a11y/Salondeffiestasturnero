@@ -17,11 +17,12 @@ const Services: React.FC = () => {
   }, []);
 
   return (
-    <section id="servicios" className="py-32 bg-white relative overflow-hidden">
+    <section id="servicios" className="py-32 bg-gradient-to-b from-white via-pink-50/20 to-purple-50/30 relative overflow-hidden">
       {/* Abstract background shapes */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[10%] left-[5%] w-96 h-96 bg-pink-50 rounded-full blur-[100px] opacity-60" />
-        <div className="absolute bottom-[10%] right-[5%] w-80 h-80 bg-purple-50 rounded-full blur-[100px] opacity-50" />
+        <div className="absolute top-[10%] left-[5%] w-96 h-96 bg-pink-100/60 rounded-full blur-[120px] opacity-60 will-change-transform" />
+        <div className="absolute bottom-[10%] right-[5%] w-80 h-80 bg-purple-100/50 rounded-full blur-[120px] opacity-50 will-change-transform" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-br from-blue-50/30 to-pink-50/30 rounded-full blur-[150px] opacity-40" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -63,19 +64,19 @@ const Services: React.FC = () => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.6 }}
               whileHover={{ y: -10 }}
-              className="relative group h-full"
+              className="relative group h-full will-change-transform"
             >
               {/* Card Background with Glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-purple-600/5 rounded-[3rem] transition-all duration-500 group-hover:from-pink-500/10 group-hover:to-purple-600/10 blur-sm" />
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-purple-600/10 rounded-[3rem] transition-all duration-500 group-hover:from-pink-500/15 group-hover:to-purple-600/15 blur-sm" />
 
-              <div className="relative h-full p-10 bg-white/70 backdrop-blur-xl rounded-[3rem] border border-white shadow-xl shadow-gray-100/50 group-hover:shadow-2xl group-hover:shadow-pink-100/40 transition-all duration-500 overflow-hidden flex flex-col">
+              <div className="relative h-full p-10 bg-white/90 backdrop-blur-xl rounded-[3rem] border-2 border-pink-100/50 shadow-xl shadow-pink-100/30 group-hover:shadow-2xl group-hover:shadow-pink-200/50 group-hover:border-pink-200 transition-all duration-500 overflow-hidden flex flex-col">
                 {/* Decorative circle */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700" />
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-700 will-change-transform" />
 
-                <div className="relative mb-10 w-20 h-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl flex items-center justify-center text-4xl shadow-lg border border-gray-100 group-hover:rotate-6 transition-all duration-500">
+                <div className="relative mb-10 w-20 h-20 bg-gradient-to-br from-white to-pink-50 rounded-2xl flex items-center justify-center text-4xl shadow-lg border-2 border-pink-100 group-hover:rotate-6 group-hover:border-pink-300 transition-all duration-500">
                   {service.icon}
                   {/* Floating sparkles in icon box */}
-                  <div className="absolute -top-2 -right-2 text-pink-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute -top-2 -right-2 text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Star size={16} fill="currentColor" />
                   </div>
                 </div>
@@ -84,17 +85,17 @@ const Services: React.FC = () => {
                   <h3 className="text-2xl font-black text-gray-900 mb-5 tracking-tight group-hover:text-pink-500 transition-colors">
                     {service.title}
                   </h3>
-                  <p className="text-gray-500/80 text-base leading-relaxed font-medium">
+                  <p className="text-gray-600 text-base leading-relaxed font-medium">
                     {service.description}
                   </p>
                 </div>
 
                 {/* Bottom line indicator */}
-                <div className="mt-8 pt-8 border-t border-gray-50 flex items-center justify-between">
-                  <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-pink-300 transition-colors">
+                <div className="mt-8 pt-8 border-t-2 border-pink-100 flex items-center justify-between">
+                  <span className="text-[10px] font-black text-pink-400 uppercase tracking-widest group-hover:text-pink-500 transition-colors">
                     0{index + 1}
                   </span>
-                  <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 group-hover:bg-pink-500 group-hover:text-white transition-all duration-500">
+                  <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition-all duration-500">
                     <Sparkles size={14} />
                   </div>
                 </div>

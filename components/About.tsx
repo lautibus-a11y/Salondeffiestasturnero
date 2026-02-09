@@ -38,8 +38,14 @@ const About: React.FC = () => {
   }, []);
 
   return (
-    <section id="nosotros" className="py-28 bg-[#fafafa]">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="nosotros" className="py-28 bg-gradient-to-b from-pink-50/20 via-purple-50/10 to-blue-50/20 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-pink-100/40 to-purple-100/30 rounded-full blur-[150px] opacity-60" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-blue-100/30 to-pink-100/40 rounded-full blur-[150px] opacity-50" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-40">
           <motion.div
@@ -108,6 +114,8 @@ const About: React.FC = () => {
                     src={content.image1}
                     alt="Nuestro Salón"
                     className="w-full h-full object-cover object-center"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </motion.div>
                 <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
@@ -135,6 +143,8 @@ const About: React.FC = () => {
                     src={content.image2}
                     alt="Detalles Premium"
                     className="w-full h-full object-cover object-center"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </motion.div>
               </div>

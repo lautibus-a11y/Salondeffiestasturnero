@@ -96,13 +96,19 @@ const BookingSection: React.FC = () => {
   };
 
   return (
-    <section id="reserva" className="py-20 md:py-32 bg-white scroll-mt-20 overflow-hidden">
-      <div className="max-w-4xl mx-auto px-4 md:px-6">
+    <section id="reserva" className="py-20 md:py-32 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-blue-50/20 scroll-mt-20 overflow-hidden relative">
+      {/* Background decorations */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-0 w-96 h-96 bg-pink-200/30 rounded-full blur-[120px] opacity-50" />
+        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-purple-200/30 rounded-full blur-[120px] opacity-50" />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 md:px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-white rounded-[2.5rem] shadow-2xl shadow-pink-100/30 border border-pink-50 overflow-hidden"
+          className="bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl shadow-pink-200/40 border-2 border-pink-100 overflow-hidden"
         >
           <AnimatePresence mode="wait">
             {!successBooking ? (
