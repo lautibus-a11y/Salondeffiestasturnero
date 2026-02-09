@@ -148,8 +148,12 @@ const AdminPanel: React.FC = () => {
   };
 
   const filteredBookings = bookings.filter(b => {
+    // Only show valid bookings
+    if (!b || !b.date) return false;
+
     const matchesFilter = filter === 'all' || b.status === filter;
-    const matchesSearch = b.date.includes(searchTerm) || b.comments?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = b.date.includes(searchTerm) ||
+      (b.comments && b.comments.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesFilter && matchesSearch;
   });
 
@@ -224,7 +228,7 @@ const AdminPanel: React.FC = () => {
                 </div>
               </div>
 
-              {/* Table Content */}
+              {/* Responisve Bookings List */}
               <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm">
                 {isLoading ? (
                   <div className="py-20 flex flex-col items-center justify-center text-gray-400 gap-4">
@@ -232,103 +236,151 @@ const AdminPanel: React.FC = () => {
                     <p className="text-sm font-bold uppercase tracking-widest">Cargando datos...</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                      <thead>
-                        <tr className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                          <th className="px-8 py-5">Fecha</th>
-                          <th className="px-8 py-5">Asistentes</th>
-                          <th className="px-8 py-5">Estado</th>
-                          <th className="px-8 py-5 text-right">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-50">
-                        {filteredBookings.length > 0 ? (
-                          filteredBookings.map((booking) => (
-                            <tr key={booking.id} className="hover:bg-gray-50/30 transition-colors group">
-                              <td className="px-8 py-6">
-                                <div className="text-sm font-black text-gray-900">{booking.date}</div>
-                                <div className="text-[10px] text-pink-400 font-black uppercase mt-0.5 tracking-tighter">{booking.time}</div>
-                              </td>
-                              <td className="px-8 py-6">
-                                <div className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                  <Users size={14} className="text-gray-300" />
-                                  {booking.kidsCount + booking.adultsCount}
-                                </div>
-                              </td>
-                              <td className="px-8 py-6">
-                                <div className="relative inline-block w-full min-w-[140px]">
-                                  <select
-                                    value={booking.status}
-                                    onChange={(e) => handleStatusChange(booking.id, e.target.value as BookingStatus)}
+                  <>
+                    {/* Desktop View: Table */}
+                    <div className="hidden md:block overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <th className="px-8 py-5">Fecha</th>
+                            <th className="px-8 py-5">Asistentes</th>
+                            <th className="px-8 py-5">Estado</th>
+                            <th className="px-8 py-5 text-right">Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                          {filteredBookings.length > 0 ? (
+                            filteredBookings.map((booking) => (
+                              <tr key={booking.id} className="hover:bg-gray-50/30 transition-colors group">
+                                <td className="px-8 py-6">
+                                  <div className="text-sm font-black text-gray-900">{formatDate(booking.date)}</div>
+                                  <div className="text-[10px] text-pink-400 font-black uppercase mt-0.5 tracking-tighter">{booking.time}</div>
+                                </td>
+                                <td className="px-8 py-6">
+                                  <div className="flex items-center gap-2 text-sm font-bold text-gray-700">
+                                    <Users size={14} className="text-gray-300" />
+                                    {booking.kidsCount + booking.adultsCount}
+                                  </div>
+                                </td>
+                                <td className="px-8 py-6">
+                                  <div className="relative inline-block w-full min-w-[140px]">
+                                    <select
+                                      value={booking.status}
+                                      onChange={(e) => handleStatusChange(booking.id, e.target.value as BookingStatus)}
+                                      className={`
+                                        appearance-none w-full text-[10px] font-black uppercase tracking-[0.1em] px-4 py-2.5 rounded-xl outline-none border-2 transition-all cursor-pointer
+                                        ${booking.status === BookingStatus.CONFIRMED ? 'bg-green-50 border-green-100 text-green-600 focus:border-green-400' :
+                                          booking.status === BookingStatus.CANCELLED ? 'bg-red-50 border-red-100 text-red-500 focus:border-red-400' :
+                                            'bg-yellow-50 border-yellow-100 text-yellow-600 focus:border-yellow-400'
+                                        }
+                                      `}
+                                    >
+                                      <option value={BookingStatus.PENDING}>Pendiente</option>
+                                      <option value={BookingStatus.CONFIRMED}>Confirmado</option>
+                                      <option value={BookingStatus.CANCELLED}>Cancelado</option>
+                                    </select>
+                                    <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 ${booking.status === BookingStatus.CONFIRMED ? 'text-green-600' :
+                                      booking.status === BookingStatus.CANCELLED ? 'text-red-500' :
+                                        'text-yellow-600'
+                                      }`}>
+                                      <ChevronRight size={14} className="rotate-90" />
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-8 py-6 text-right">
+                                  <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    {booking.status !== BookingStatus.CONFIRMED && (
+                                      <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.CONFIRMED)}
+                                        className="p-2.5 bg-green-50 text-green-500 rounded-xl hover:bg-green-100 transition-colors shadow-sm"
+                                        title="Confirmar"
+                                      >
+                                        <CheckCircle size={18} />
+                                      </button>
+                                    )}
+                                    {booking.status !== BookingStatus.CANCELLED && (
+                                      <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.CANCELLED)}
+                                        className="p-2.5 bg-red-50 text-red-400 rounded-xl hover:bg-red-100 transition-colors shadow-sm"
+                                        title="Cancelar"
+                                      >
+                                        <XCircle size={18} />
+                                      </button>
+                                    )}
+                                    <button
+                                      onClick={() => handleDeleteBooking(booking.id)}
+                                      className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                      title="Eliminar Permanente"
+                                    >
+                                      <Trash2 size={18} />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={4} className="px-8 py-32 text-center text-gray-300 text-sm font-bold uppercase tracking-widest">No se encontraron registros</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Mobile View: Cards */}
+                    <div className="block md:hidden divide-y divide-gray-100">
+                      {filteredBookings.length > 0 ? (
+                        filteredBookings.map((booking) => (
+                          <div key={booking.id} className="p-6 space-y-4 hover:bg-gray-50/30 transition-colors">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <div className="text-base font-black text-gray-900">{formatDate(booking.date)}</div>
+                                <div className="text-xs text-pink-500 font-black uppercase mt-1 tracking-widest">{booking.time}</div>
+                              </div>
+                              <button
+                                onClick={() => handleDeleteBooking(booking.id)}
+                                className="p-3 bg-red-50 text-red-500 rounded-xl active:bg-red-600 active:text-white transition-all shadow-sm"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </div>
+
+                            <div className="flex items-center gap-4 py-2 border-y border-gray-50">
+                              <div className="flex items-center gap-2 text-sm font-bold text-gray-600">
+                                <Users size={16} className="text-gray-300" />
+                                {booking.kidsCount + booking.adultsCount} Invitados
+                              </div>
+                            </div>
+
+                            <div className="pt-2">
+                              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-2 block">Cambiar Estado</label>
+                              <div className="grid grid-cols-3 gap-2">
+                                {[BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CANCELLED].map((st) => (
+                                  <button
+                                    key={st}
+                                    onClick={() => handleStatusChange(booking.id, st)}
                                     className={`
-                                      appearance-none w-full text-[10px] font-black uppercase tracking-[0.1em] px-4 py-2.5 rounded-xl outline-none border-2 transition-all cursor-pointer
-                                      ${booking.status === BookingStatus.CONFIRMED ? 'bg-green-50 border-green-100 text-green-600 focus:border-green-400' :
-                                        booking.status === BookingStatus.CANCELLED ? 'bg-red-50 border-red-100 text-red-500 focus:border-red-400' :
-                                          'bg-yellow-50 border-yellow-100 text-yellow-600 focus:border-yellow-400'
+                                      py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest border-2 transition-all
+                                      ${booking.status === st
+                                        ? st === BookingStatus.CONFIRMED ? 'bg-green-500 border-green-500 text-white' :
+                                          st === BookingStatus.CANCELLED ? 'bg-red-500 border-red-500 text-white' :
+                                            'bg-yellow-500 border-yellow-500 text-white'
+                                        : 'bg-white border-gray-100 text-gray-400'
                                       }
                                     `}
                                   >
-                                    <option value={BookingStatus.PENDING}>Pendiente</option>
-                                    <option value={BookingStatus.CONFIRMED}>Confirmado</option>
-                                    <option value={BookingStatus.CANCELLED}>Cancelado</option>
-                                  </select>
-                                  <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 ${booking.status === BookingStatus.CONFIRMED ? 'text-green-600' :
-                                    booking.status === BookingStatus.CANCELLED ? 'text-red-500' :
-                                      'text-yellow-600'
-                                    }`}>
-                                    <ChevronRight size={14} className="rotate-90" />
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-8 py-6 text-right">
-                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  {booking.status !== BookingStatus.CONFIRMED && (
-                                    <button
-                                      onClick={() => handleStatusChange(booking.id, BookingStatus.CONFIRMED)}
-                                      className="p-2.5 bg-green-50 text-green-500 rounded-xl hover:bg-green-100 transition-colors shadow-sm"
-                                      title="Confirmar"
-                                    >
-                                      <CheckCircle size={18} />
-                                    </button>
-                                  )}
-                                  {booking.status !== BookingStatus.CANCELLED && (
-                                    <button
-                                      onClick={() => handleStatusChange(booking.id, BookingStatus.CANCELLED)}
-                                      className="p-2.5 bg-red-50 text-red-400 rounded-xl hover:bg-red-100 transition-colors shadow-sm"
-                                      title="Cancelar"
-                                    >
-                                      <XCircle size={18} />
-                                    </button>
-                                  )}
-                                  {booking.status !== BookingStatus.PENDING && (
-                                    <button
-                                      onClick={() => handleStatusChange(booking.id, BookingStatus.PENDING)}
-                                      className="p-2.5 bg-yellow-50 text-yellow-500 rounded-xl hover:bg-yellow-100 transition-colors shadow-sm"
-                                      title="Volver a Pendiente"
-                                    >
-                                      <Clock size={18} />
-                                    </button>
-                                  )}
-                                  <button
-                                    onClick={() => handleDeleteBooking(booking.id)}
-                                    className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm"
-                                    title="Eliminar Permanente"
-                                  >
-                                    <Trash2 size={18} />
+                                    {st === BookingStatus.PENDING ? 'Pend' : st === BookingStatus.CONFIRMED ? 'Conf' : 'Canc'}
                                   </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan={4} className="px-8 py-32 text-center text-gray-300 text-sm font-bold uppercase tracking-widest">No se encontraron registros</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-6 py-20 text-center text-gray-300 text-sm font-bold uppercase tracking-widest">No se encontraron registros</div>
+                      )}
+                    </div>
+                  </>
                 )}
               </div>
             </motion.div>

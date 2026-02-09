@@ -38,8 +38,10 @@ const NumberInput: React.FC<{
 );
 
 const BookingSection: React.FC = () => {
+  const getTodayDate = () => new Date().toISOString().split('T')[0];
+
   const [formData, setFormData] = useState({
-    date: '',
+    date: getTodayDate(),
     time: '',
     kidsCount: 20,
     adultsCount: 20,
@@ -49,23 +51,65 @@ const BookingSection: React.FC = () => {
   const [successBooking, setSuccessBooking] = useState<Booking | null>(null);
   const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
 
-  React.useEffect(() => {
-    if (formData.date) {
-      const fetchAvailability = async () => {
-        const bookings = await db.getBookings();
-        const taken = bookings
-          .filter(b => b.date === formData.date && b.status !== BookingStatus.CANCELLED)
-          .map(b => b.time);
-        setOccupiedSlots(taken);
+  const dateInputRef = React.useRef<HTMLInputElement>(null);
 
-        // Clear selected time if it becomes occupied
-        if (taken.includes(formData.time)) {
-          setFormData(prev => ({ ...prev, time: '' }));
-        }
-      };
-      fetchAvailability();
+  const getTomorrowDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  };
+
+  const handleDateClick = (value: string) => {
+    if (value === 'custom') {
+      try {
+        dateInputRef.current?.showPicker();
+      } catch (e) {
+        dateInputRef.current?.focus();
+        dateInputRef.current?.click();
+      }
+    } else {
+      setFormData({ ...formData, date: value });
     }
+  };
+
+  const fetchAvailability = async (selectedDate: string) => {
+    if (!selectedDate) return;
+    try {
+      const bookings = await db.getBookings();
+      const taken = bookings
+        .filter(b =>
+          b.date === selectedDate &&
+          b.status !== BookingStatus.CANCELLED &&
+          b.status !== ('cancelado' as BookingStatus)
+        )
+        .map(b => b.time);
+
+      setOccupiedSlots(taken);
+
+      // Clear selected time if it becomes occupied
+      if (taken.includes(formData.time)) {
+        setFormData(prev => ({ ...prev, time: '' }));
+      }
+    } catch (error) {
+      console.error("Error fetching availability:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchAvailability(formData.date);
+
+    // Refresh when tab becomes visible or gets focus to stay in sync with admin changes
+    const handleSync = () => fetchAvailability(formData.date);
+    window.addEventListener('focus', handleSync);
+    window.addEventListener('visibilitychange', handleSync);
+
+    return () => {
+      window.removeEventListener('focus', handleSync);
+      window.removeEventListener('visibilitychange', handleSync);
+    };
   }, [formData.date]);
+
+  const sectionRef = React.useRef<HTMLElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +126,11 @@ const BookingSection: React.FC = () => {
 
       const savedBooking = await db.saveBooking(bookingData);
       setSuccessBooking(savedBooking);
+
+      // Scroll smoothly to the top of the section to show the success message
+      setTimeout(() => {
+        sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     } catch (error) {
       console.error("Error al guardar la reserva:", error);
       alert("Hubo un error al procesar tu reserva. Por favor intenta de nuevo.");
@@ -96,7 +145,7 @@ const BookingSection: React.FC = () => {
   };
 
   return (
-    <section id="reserva" className="py-20 md:py-32 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-blue-50/20 scroll-mt-20 overflow-hidden relative">
+    <section ref={sectionRef} id="reserva" className="py-20 md:py-32 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-blue-50/20 scroll-mt-20 overflow-hidden relative">
       {/* Background decorations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-0 w-96 h-96 bg-pink-200/30 rounded-full blur-[120px] opacity-50" />
@@ -130,21 +179,58 @@ const BookingSection: React.FC = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-12">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                  <div className="space-y-8">
                     <div className="space-y-4">
                       <label className="text-gray-400 font-black text-[10px] uppercase tracking-widest ml-1 block">Día del evento</label>
-                      <input
-                        required
-                        type="date"
-                        min={new Date().toISOString().split('T')[0]}
-                        value={formData.date}
-                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                        className="w-full bg-gray-50 border-2 border-transparent rounded-[1.5rem] p-6 outline-none focus:bg-white focus:border-pink-200 transition-all text-base font-bold text-gray-700 shadow-sm"
-                      />
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {[
+                          { label: 'Hoy', value: getTodayDate() },
+                          { label: 'Mañana', value: getTomorrowDate() },
+                          { label: 'Otro día', value: 'custom' }
+                        ].map((day) => {
+                          const isSelected = day.value === 'custom' ?
+                            (formData.date !== getTodayDate() && formData.date !== getTomorrowDate()) :
+                            formData.date === day.value;
+
+                          return (
+                            <button
+                              key={day.label}
+                              type="button"
+                              onClick={() => handleDateClick(day.value)}
+                              className={`
+                                relative p-4 rounded-2xl text-sm font-bold transition-all border-2
+                                ${isSelected
+                                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 border-transparent text-white shadow-lg shadow-pink-100'
+                                  : 'bg-white border-gray-100 text-gray-600 hover:border-pink-200'
+                                }
+                                ${day.value === 'custom' ? 'overflow-hidden' : ''}
+                              `}
+                            >
+                              <span className="relative z-10">{day.label}</span>
+                              {day.value === 'custom' && (
+                                <input
+                                  ref={dateInputRef}
+                                  type="date"
+                                  min={getTodayDate()}
+                                  value={formData.date}
+                                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                  className="absolute inset-0 opacity-0 cursor-pointer z-0"
+                                />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {formData.date && (
+                        <p className="text-xs font-bold text-pink-500 ml-1">
+                          Viendo disponibilidad para: <span className="capitalize">{formatDate(formData.date)}</span>
+                        </p>
+                      )}
                     </div>
+
                     <div className="space-y-4">
                       <label className="text-gray-400 font-black text-[10px] uppercase tracking-widest ml-1 block">Franja horaria</label>
-                      <div className="grid grid-cols-1 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {TIME_SLOTS.map((slot) => {
                           const isOccupied = occupiedSlots.includes(slot);
                           const isSelected = formData.time === slot;
@@ -167,13 +253,13 @@ const BookingSection: React.FC = () => {
                             >
                               <div className="flex items-center justify-between">
                                 <span className="relative z-10">{slot}</span>
-                                {isOccupied && <span className="text-[9px] uppercase tracking-tighter opacity-50 relative z-10">Ocupado</span>}
+                                {isOccupied && <span className="text-[10px] font-black uppercase tracking-widest text-pink-500/60 relative z-10">Ocupado</span>}
                               </div>
 
                               {/* Team Color Cross for occupied slots */}
                               {isOccupied && (
                                 <div className="absolute inset-0 pointer-events-none">
-                                  <svg className="w-full h-full opacity-40">
+                                  <svg className="w-full h-full opacity-60">
                                     <line x1="0" y1="0" x2="100%" y2="100%" stroke="url(#crossGradient)" strokeWidth="3" />
                                     <line x1="100%" y1="0" x2="0" y2="100%" stroke="url(#crossGradient)" strokeWidth="3" />
                                     <defs>

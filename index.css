@@ -20,13 +20,17 @@ body {
 
 /* Prevenir zoom automático en iOS para inputs */
 @media screen and (max-width: 768px) {
-  input, select, textarea {
+
+  input,
+  select,
+  textarea {
     font-size: 16px !important;
   }
 }
 
 /* Performance Optimizations */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -50,25 +54,33 @@ img[loading="lazy"] {
   background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 100%);
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Simplified to avoid visual clutter */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: linear-gradient(180deg, #fdf2f8 0%, #f5f3ff 100%);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #f9a8d4 0%, #c084fc 100%);
+  background: #e5e7eb;
   border-radius: 10px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #ec4899 0%, #a855f7 100%);
-  background-clip: padding-box;
+  background: #d1d5db;
+}
+
+/* Utilities */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Safe Area Spacing */

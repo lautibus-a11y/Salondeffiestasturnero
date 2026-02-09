@@ -10,7 +10,8 @@ export const generateWhatsAppLink = (booking: Booking, phone: string): string =>
 
 export const formatDate = (dateStr: string): string => {
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(dateStr).toLocaleDateString('es-ES', options);
+  // Adding T12:00:00 to avoid timezone shifts that can change the day
+  return new Date(`${dateStr}T12:00:00`).toLocaleDateString('es-ES', options);
 };
 
 // Helpers para mapear entre la base de datos (snake_case) y el frontend (camelCase)
